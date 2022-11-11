@@ -14,8 +14,8 @@ impl TypeMapKey for PresenceCache {
 
 pub fn status_to_sleep(status: OnlineStatus) -> Result<SleepState> {
     match status {
-        OnlineStatus::DoNotDisturb | OnlineStatus::Idle | OnlineStatus::Online => Ok(SleepState::Woke),
-        OnlineStatus::Offline | OnlineStatus::Invisible => Ok(SleepState::Sleep),
+        OnlineStatus::DoNotDisturb | OnlineStatus::Online => Ok(SleepState::Woke),
+        OnlineStatus::Idle | OnlineStatus::Offline | OnlineStatus::Invisible => Ok(SleepState::Sleep),
         _ => Err(anyhow!("Unknown presence status: {:?}", status)),
     }
 }
