@@ -1366,6 +1366,7 @@ dependencies = [
  "mongodb",
  "rand",
  "serde",
+ "serde_json",
  "serenity",
  "tokio",
 ]

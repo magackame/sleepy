@@ -6,6 +6,12 @@ use commands::*;
 mod db;
 mod util;
 
+mod config;
+use config::{
+    CONFIG_FILENAME,
+    BotConfig,
+};
+
 mod presence;
 use presence::cache::{PresenceCache, status_to_sleep, PresenceCacheEntry};
 
@@ -154,8 +160,11 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    let token = std::env::var("DISCORD_TOKEN")
-        .expect("DISCORD_TOKEN env var is not set");
+    let config_content = tokio::fs::read_to_string(CONFIG_FILENAME).await
+        .expect(&format!("Failed to read file '{}'", CONFIG_FILENAME));
+
+    let bot_config = serde_json::from_str::<BotConfig>(&config_content)
+        .expect("Failed to deserialize config");
 
     let mut intents = GatewayIntents::default();
 
@@ -163,7 +172,7 @@ async fn main() {
     intents.set(GatewayIntents::GUILD_PRESENCES, true);
     intents.set(GatewayIntents::GUILD_MEMBERS, true);
 
-    let mut client = Client::builder(token, intents)
+    let mut client = Client::builder(bot_config.token, intents)
         .event_handler(Handler {
             db: db::connect().await,
         })
