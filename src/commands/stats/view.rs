@@ -54,7 +54,11 @@ pub async fn run(db: &Database, ctx: &Context, command: &ApplicationCommandInter
     }
 
     if woke_count + sleep_count < 3 {
-        interaction::send_silent(ctx, command, "You must go through at least one full sleep cycle, before viewing your stats").await;
+        interaction::send_followup(ctx, command, |message| {
+            message
+                .ephemeral(true)
+                .content("You must go through at least one full sleep cycle, before viewing your stats")
+        }).await;
 
         return Ok(());
     }
