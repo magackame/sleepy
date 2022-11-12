@@ -1,6 +1,6 @@
 use mongodb::Cursor;
 use mongodb::bson::oid::ObjectId;
-use mongodb::results::{InsertOneResult, UpdateResult};
+use mongodb::results::{InsertOneResult, UpdateResult, DeleteResult};
 use mongodb::{
     bson::doc,
     Client,
@@ -68,19 +68,29 @@ pub async fn update_sleep_time(db: &Database, _id: ObjectId, time: i64) -> Resul
 }
 
 pub async fn fetch_sleep_all(db: &Database, id: &str) -> Result<Cursor<Sleep>> {
-    const FETCH_SLEEP_ALL_LIMIT: i64 = 100;
+    const FETCH_LIMIT: i64 = 60_000;
     
     let collection = db.collection::<Sleep>(SLEEP_COLLECTION_NAME);
 
     let filter = doc! { "id": id };
     let options = FindOptions::builder()
         .sort(doc! { "_id": -1 })
-        .limit(FETCH_SLEEP_ALL_LIMIT)
+        .limit(FETCH_LIMIT)
         .build();
 
     let cursor = collection.find(filter, options).await?;
     
     Ok(cursor)
+}
+
+pub async fn delete_sleep_all(db: &Database, id: &str) -> Result<DeleteResult> {
+    let collection = db.collection::<Sleep>(SLEEP_COLLECTION_NAME);
+
+    let filter = doc! { "id": id };
+
+    let delete = collection.delete_many(filter, None).await?;
+    
+    Ok(delete)
 }
 
 pub async fn update_sleep_mentions(db: &Database, _id: ObjectId, sender_id: &str) -> Result<UpdateResult> {

@@ -32,6 +32,25 @@ impl Sleep {
 }
 
 #[derive(Deserialize, Serialize)]
+pub struct DownloadSleep {
+    pub state: SleepState,
+    pub time: i64,
+    pub mentions: Vec<String>,
+    pub date: DateTime<Utc>,
+}
+
+impl From<Sleep> for DownloadSleep {
+    fn from(sleep: Sleep) -> Self {
+        Self {
+            state: sleep.state,
+            time: sleep.time,
+            mentions: sleep.mentions,
+            date: sleep.date,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize)]
 pub struct UserOptions {
     pub _id: ObjectId,
     pub id: String,

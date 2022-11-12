@@ -1,11 +1,7 @@
-use serenity::builder::CreateApplicationCommand;
-
 use mongodb::Database;
 
 use crate::db;
-use crate::db::data::{
-    SleepState,
-};
+use crate::db::data::SleepState;
 use crate::util::seconds_pretty;
 
 use anyhow::Result;
@@ -18,17 +14,15 @@ use crate::util::{
     interaction,
 };
 
-pub const NAME: &str = "stat";
-
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command
-        .name(NAME)
-        .description("Lets see how well do you sleep...")
-}
+pub const NAME: &str = "view";
 
 pub async fn run(db: &Database, ctx: &Context, command: &ApplicationCommandInteraction) -> Result<()> {
+    interaction::send_deffered(ctx, command, |message| {
+        message
+            .content("Calculating...")
+    }).await;
+    
     let id = command.user.id.to_string();
-
     let mut cursor = db::fetch_sleep_all(db, &id).await?;
 
     let mut sleep_count = 0;
@@ -71,19 +65,20 @@ pub async fn run(db: &Database, ctx: &Context, command: &ApplicationCommandInter
     let woke_average = woke_total / woke_count;
     let sleep_average = sleep_total / sleep_count;
 
-    let embed = super::colorful_embed()
+    let mut embed = super::super::colorful_embed();
+
+    embed
         .title("Sleep stats")
         .description(format!("Lets see how well <@{}> sleeps...", id))
         .field("Average /woke time", format!("<t:{}:t>", woke_average), false)
         .field("Average /sleep time", format!("<t:{}:t>", sleep_average), false)
         .field("Average awake duration", seconds_pretty(woke_average_seconds), false)
-        .field("Average sleep duration", seconds_pretty(sleep_average_seconds), false)
-        .clone();
+        .field("Average sleep duration", seconds_pretty(sleep_average_seconds), false);
 
-    interaction::send(ctx, command, |message| {
+    interaction::send_followup(ctx, command, |message| {
         message
             .set_embed(embed)
     }).await;
-    
+
     Ok(())
 }

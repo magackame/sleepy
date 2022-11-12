@@ -11,7 +11,7 @@ use crate::{util::{
 pub mod error;
 pub mod unknown;
 pub mod gn_group;
-pub mod stat;
+pub mod stats;
 pub mod nap_group;
 pub mod sleepyheads_group;
 pub mod auto_group;

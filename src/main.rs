@@ -39,7 +39,7 @@ impl EventHandler for Handler {
                 sleep_group::woke::NAME => sleep_group::woke::run(&self.db, &ctx, &command).await,
                 gn_group::gn::NAME => gn_group::gn::run(&ctx, &command).await,
                 gn_group::gm::NAME => gn_group::gm::run(&ctx, &command).await,
-                stat::NAME => stat::run(&self.db, &ctx, &command).await,
+                stats::NAME => stats::run(&self.db, &ctx, &command).await,
                 nap_group::nap::NAME => nap_group::nap::run(&self.db, &ctx, &command).await,
                 nap_group::wakey::NAME => nap_group::wakey::run(&self.db, &ctx, &command).await,
                 sleepyheads_group::sleepyheads::NAME => sleepyheads_group::sleepyheads::run(&self.db, &ctx, &command).await,
@@ -125,7 +125,7 @@ impl EventHandler for Handler {
             });
 
             commands.create_application_command(|command| {
-                stat::register(command)
+                stats::register(command)
             });
 
             commands.create_application_command(|command| {
